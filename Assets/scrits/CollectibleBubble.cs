@@ -2,26 +2,34 @@ using UnityEngine;
 
 public class CollectibleBubble : MonoBehaviour
 {
-    public SlidingDoor doorToOpen; // Assign this in the inspector
-    
+    public SlidingDoor doorToOpen; // Assign in inspector
+    public float sizeIncreaseAmount = 0.1f;
+    public ParticleSystem collectEffect; // Optional visual effect
+
     void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
-            BubbleMovement bubbleMovement = other.GetComponent<BubbleMovement>();
-            if (bubbleMovement != null)
+            BubbleMovement player = other.GetComponent<BubbleMovement>();
+            if (player != null)
             {
-                Debug.Log("Bubble collected!");
+                // Play collection effect if available
+                if (collectEffect != null)
+                {
+                    Instantiate(collectEffect, transform.position, Quaternion.identity);
+                }
+
+                // Increase player size
+                player.IncreaseSize(sizeIncreaseAmount);
                 
-                // Notify the door that a bubble was collected
+                // Notify door
                 if (doorToOpen != null)
                 {
                     doorToOpen.BubbleCollected();
                 }
-            }
 
-            Destroy(gameObject);
+                Destroy(gameObject);
+            }
         }
     }
 }
-
